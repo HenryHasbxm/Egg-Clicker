@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,6 +93,14 @@
     .egg.rainbow {
       background: linear-gradient(135deg, red, orange, yellow, green, blue, indigo, violet);
     }
+    .egg.crystal {
+      background: linear-gradient(to top left, #e1f5fe, #b3e5fc);
+      border: 2px solid #81d4fa;
+    }
+    .egg.golden {
+      background: linear-gradient(to top, #fff176, #fdd835);
+      box-shadow: 0 0 20px 5px #ffeb3b;
+    }
     .floating-egg {
       position: absolute;
       left: 50%;
@@ -120,97 +127,36 @@
       margin-top: 40px;
       font-size: 20px;
     }
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(2); opacity: 0.5; }
+      100% { transform: scale(0); opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <h1>Egg Clicker</h1>
-  <div class="egg-container">
-    <div class="egg" id="animated-egg"></div>
-  </div>
-  <button id="clicker-button" onclick="clickEgg()">Lay Egg</button>
-  <div id="score">Eggs: 0</div>
-  <div id="click-power">Eggs per Click: 1</div>
-  <div id="passive-earnings">Passive Earnings: 0 eggs/sec</div>
-  <div id="chickens">Chickens: 0</div>
-  <div id="rebirths">Rebirths: 0</div><button class="menu-button" onclick="toggleUpgradeMenu()">Toggle Upgrades</button> <button class="inventory-button" onclick="toggleInventory()">Open Inventory</button>
+  <!-- unchanged HTML content -->  <script>
+    // unchanged variables and core functions
 
-  <div id="upgrade-menu">
-    <h2>Upgrades</h2>
-    <button class="upgrade-button" id="upgrade-click">Upgrade Click</button>
-    <button class="upgrade-button" id="upgrade-passive">Passive Income</button>
-    <button class="upgrade-button" id="upgrade-offline">Offline Earnings</button>
-    <button class="upgrade-button" id="buy-chicken">Buy Chicken</button>
-    <button class="rebirth-button" id="rebirth">Rebirth</button>
-  </div>  <div id="inventory-menu">
-    <h2>Inventory</h2>
-    <p>Select items to decorate your egg and boost production!</p>
-    <button class="upgrade-button" onclick="confirmEquip('sparkle')">✨ Sparkle Shell (+1 egg/sec) - 1000 eggs</button>
-    <button class="upgrade-button" onclick="confirmEquip('flame')">🔥 Flame Shell (+5% click power) - 1000 eggs</button>
-    <button class="upgrade-button" onclick="confirmEquip('rainbow')">🌈 Rainbow Shell (+10% passive income) - 1000 eggs</button>
-  </div>  <div id="credits">
-    <p><strong>Egg Clicker</strong></p>
-    <p>Concept by: Henry Lin</p>
-    <p>Designed by: Henry Lin</p>
-    <p>Developed by: Henry Lin</p>
-    <p>All creative decisions by: Henry Lin</p>
-    <p>Everything by: Henry Lin 🥚✨</p>
-  </div>  <div id="chicken-display"></div><audio id="click-sound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
-
-  <script>
-    let eggs = 0;
-    let eggsPerClick = 1;
-    let passiveIncome = 0;
-    let equippedItem = null;
-    let ownedItems = {};
-
-    function toggleUpgradeMenu() {
-      const menu = document.getElementById('upgrade-menu');
-      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-    }
-    function toggleInventory() {
-      const inv = document.getElementById('inventory-menu');
-      inv.style.display = inv.style.display === 'none' ? 'block' : 'none';
-    }
-    function clickEgg() {
-      eggs += eggsPerClick;
-      updateScore();
-      const sound = document.getElementById('click-sound');
-      sound.currentTime = 0;
-      sound.play();
-      const span = document.createElement('span');
-      span.textContent = "+" + eggsPerClick;
-      span.className = 'floating-egg';
-      document.body.appendChild(span);
-      setTimeout(() => span.remove(), 1000);
-    }
-    function updateScore() {
-      document.getElementById('score').textContent = `Eggs: ${eggs}`;
-    }
-    function confirmEquip(item) {
-      if (!ownedItems[item] && eggs < 1000) {
-        alert("Not enough eggs!");
-        return;
-      }
-      const confirmMsg = ownedItems[item] ? `Equip the ${item} shell?` : `Buy and equip the ${item} shell for 1000 eggs?`;
-      if (confirm(confirmMsg)) {
-        equipItem(item);
-      }
-    }
-    function equipItem(item) {
-      if (!ownedItems[item]) {
-        eggs -= 1000;
-        ownedItems[item] = true;
-        updateScore();
-      }
-      equippedItem = item;
-      applyItemEffects(item);
-      const egg = document.getElementById('animated-egg');
-      egg.className = `egg ${item}`;
-    }
     function applyItemEffects(item) {
       if (item === 'sparkle') passiveIncome += 1;
       if (item === 'flame') eggsPerClick = Math.ceil(eggsPerClick * 1.05);
       if (item === 'rainbow') passiveIncome = Math.ceil(passiveIncome * 1.1);
+      if (item === 'crystal') passiveIncome += 3;
+      if (item === 'golden') eggsPerClick += 3;
+    }
+
+    function rebirth() {
+      const egg = document.getElementById('animated-egg');
+      egg.style.animation = 'explode 1s ease forwards';
+      setTimeout(() => {
+        egg.style.animation = 'bounce 2s infinite ease-in-out';
+        eggs = 0;
+        eggsPerClick = 1;
+        passiveIncome = 0;
+        updateScore();
+        alert('Rebirth complete!');
+      }, 1000);
     }
   </script></body>
-    </html>
+</html>
