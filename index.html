@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,11 +50,11 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
-    .upgrade-button, .menu-button {
+    .upgrade-button, .menu-button, .inventory-button {
       background-color: #2196F3;
       color: white;
     }
-    .upgrade-button:hover, .menu-button:hover {
+    .upgrade-button:hover, .menu-button:hover, .inventory-button:hover {
       background-color: #1e88e5;
     }
     .rebirth-button {
@@ -107,7 +106,7 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    #upgrade-menu {
+    #upgrade-menu, #inventory-menu {
       display: none;
       margin-top: 20px;
     }
@@ -129,7 +128,7 @@
   <div id="passive-earnings">Passive Earnings: 0 eggs/sec</div>
   <div id="chickens">Chickens: 0</div>
   <div id="rebirths">Rebirths: 0</div>
-  <div id="rebirth-cost">Rebirth Cost: 1000 eggs</div><button class="menu-button" onclick="toggleUpgradeMenu()">Toggle Upgrades</button>
+  <div id="rebirth-cost">Rebirth Cost: 1000 eggs</div><button class="menu-button" onclick="toggleUpgradeMenu()">Toggle Upgrades</button> <button class="inventory-button" onclick="toggleInventory()">Open Inventory</button>
 
   <div id="upgrade-menu">
     <h2>Upgrades</h2>
@@ -137,6 +136,12 @@
     <button class="upgrade-button" id="upgrade-passive">Passive Income</button>
     <button class="upgrade-button" id="upgrade-offline">Offline Earnings</button>
     <button class="upgrade-button" id="buy-chicken">Buy Chicken</button>
+  </div>  <div id="inventory-menu">
+    <h2>Inventory</h2>
+    <p>Select items to decorate your egg and boost production!</p>
+    <button class="upgrade-button" onclick="equipItem('sparkle')">✨ Sparkle Shell (+1 egg/sec)</button>
+    <button class="upgrade-button" onclick="equipItem('flame')">🔥 Flame Shell (+5% click power)</button>
+    <button class="upgrade-button" onclick="equipItem('rainbow')">🌈 Rainbow Shell (+10% passive income)</button>
   </div>  <h2>Rebirth</h2>
   <button class="rebirth-button" id="rebirth">Rebirth</button>  <div id="chicken-display"></div><button class="menu-button" onclick="toggleCredits()">Credits</button>
 
@@ -150,24 +155,44 @@
   </div><audio id="click-sound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
 
   <script>
+    let eggs = 0;
+    let eggsPerClick = 1;
+    let passiveIncome = 0;
+    let equippedItem = null;
+
     function toggleUpgradeMenu() {
       const menu = document.getElementById('upgrade-menu');
       menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    function toggleInventory() {
+      const inv = document.getElementById('inventory-menu');
+      inv.style.display = inv.style.display === 'none' ? 'block' : 'none';
     }
     function toggleCredits() {
       const credits = document.getElementById('credits');
       credits.style.display = credits.style.display === 'none' ? 'block' : 'none';
     }
     function clickEgg() {
+      eggs += eggsPerClick;
+      updateScore();
       const sound = document.getElementById('click-sound');
       sound.currentTime = 0;
       sound.play();
-
       const span = document.createElement('span');
-      span.textContent = "+1";
+      span.textContent = "+" + eggsPerClick;
       span.className = 'floating-egg';
       document.body.appendChild(span);
       setTimeout(() => span.remove(), 1000);
+    }
+    function updateScore() {
+      document.getElementById('score').textContent = `Eggs: ${eggs}`;
+    }
+    function equipItem(item) {
+      equippedItem = item;
+      if (item === 'sparkle') passiveIncome += 1;
+      if (item === 'flame') eggsPerClick = Math.ceil(eggsPerClick * 1.05);
+      if (item === 'rainbow') passiveIncome = Math.ceil(passiveIncome * 1.1);
+      alert(`Equipped ${item} shell!`);
     }
   </script></body>
   </html>
