@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Egg Clicker Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(to bottom, #fceabb, #f8b500);
+      color: #333;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    button {
+      font-size: 18px;
+      padding: 15px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    #clicker-button {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 24px;
+      padding: 20px 40px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .upgrade-button {
+      background-color: #2196F3;
+      color: white;
+    }
+    .upgrade-button:hover {
+      background-color: #1e88e5;
+    }
+    .rebirth-button {
+      background-color: #FF5722;
+      color: white;
+    }
+    .rebirth-button:hover {
+      background-color: #e64a19;
+    }
+    #score, #click-power, #rebirths, #passive-earnings, #chickens {
+      font-size: 24px;
+      margin: 10px;
+    }
+    .egg-container {
+      position: relative;
+      width: 100px;
+      height: 130px;
+      margin: 20px auto;
+    }
+    .egg {
+      position: absolute;
+      width: 100px;
+      height: 130px;
+      background: radial-gradient(circle at 50% 50%, #fff 0%, #f4f4f4 100%);
+      border-radius: 50% 50% 45% 45%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      animation: bounce 2s infinite ease-in-out;
+    }
+    @keyframes bounce {
+      0%, 100% { top: 0; }
+      50% { top: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Egg Clicker</h1>
+  <div class="egg-container">
+    <div class="egg" id="animated-egg"></div>
+  </div>
+  <button id="clicker-button">Lay Egg</button>
+  <div id="score">Eggs: 0</div>
+  <div id="click-power">Eggs per Click: 1</div>
+  <div id="passive-earnings">Passive Earnings: 0 eggs/sec</div>
+  <div id="chickens">Chickens: 0</div>
+  <div id="rebirths">Rebirths: 0</div>
+  <div id="rebirth-cost">Rebirth Cost: 1000 eggs</div>  <h2>Upgrades</h2>
+  <button class="upgrade-button" id="upgrade-click">Upgrade Click (Cost: 50 eggs)</button>
+  <button class="upgrade-button" id="upgrade-passive">Passive Income (Cost: 100 eggs)</button>
+  <button class="upgrade-button" id="upgrade-offline">Offline Earnings (Cost: 250 eggs)</button>
+  <button class="upgrade-button" id="buy-chicken">Buy Chicken (Cost: 200 eggs)</button>  <h2>Rebirth</h2>
+  <button class="rebirth-button" id="rebirth">Rebirth</button>  <script>
+    let score = 0;
+    let clickPower = 1;
+    let rebirths = 0;
+    let passiveEarnings = 0;
+    let offlineEarningsUnlocked = false;
+    let lastActiveTime = Date.now();
+    let baseRebirthCost = 1000;
+    let chickens = 0;
+
+    const clickButton = document.getElementById('clicker-button');
+    const scoreDisplay = document.getElementById('score');
+    const clickPowerDisplay = document.getElementById('click-power');
+    const passiveEarningsDisplay = document.getElementById('passive-earnings');
+    const rebirthsDisplay = document.getElementById('rebirths');
+    const rebirthCostDisplay = document.getElementById('rebirth-cost');
+    const chickensDisplay = document.getElementById('chickens');
+
+    const upgradeClickButton = document.getElementById('upgrade-click');
+    const upgradePassiveButton = document.getElementById('upgrade-passive');
+    const upgradeOfflineButton = document.getElementById('upgrade-offline');
+    const buyChickenButton = document.getElementById('buy-chicken');
+    const rebirthButton = document.getElementById('rebirth');
+    const egg = document.getElementById('animated-egg');
+
+    function getRebirthCost() {
+      return Math.floor(baseRebirthCost * Math.pow(1.5, rebirths));
+    }
+
+    function updateDisplay() {
+      scoreDisplay.textContent = `Eggs: ${Math.floor(score)}`;
+      clickPowerDisplay.textContent = `Eggs per Click: ${clickPower}`;
+      passiveEarningsDisplay.textContent = `Passive Earnings: ${passiveEarnings} eggs/sec`;
+      chickensDisplay.textContent = `Chickens: ${chickens}`;
+      rebirthsDisplay.textContent = `Rebirths: ${rebirths}`;
+      rebirthCostDisplay.textContent = `Rebirth Cost: ${getRebirthCost()} eggs`;
+    }
+
+    function animateEggClick() {
+      egg.style.transition = 'transform 0.1s';
+      egg.style.transform = 'scale(1.1)';
+      setTimeout(() => {
+        egg.style.transform = 'scale(1)';
+      }, 100);
+    }
+
+    function earnPassive() {
+      score += (passiveEarnings + chickens) / 10;
+      updateDisplay();
+    }
+    setInterval(earnPassive, 100);
+
+    clickButton.addEventListener('click', () => {
+      score += clickPower;
+      animateEggClick();
+      updateDisplay();
+    });
+
+    upgradeClickButton.addEventListener('click', () => {
+      if (score >= 50) {
+        score -= 50;
+        clickPower += 1;
+        updateDisplay();
+      } else {
+        alert('Not enough eggs for upgrade!');
+      }
+    });
+
+    upgradePassiveButton.addEventListener('click', () => {
+      if (score >= 100) {
+        score -= 100;
+        passiveEarnings += 1;
+        updateDisplay();
+      } else {
+        alert('Not enough eggs for passive income!');
+      }
+    });
+
+    upgradeOfflineButton.addEventListener('click', () => {
+      if (score >= 250) {
+        score -= 250;
+        offlineEarningsUnlocked = true;
+        alert('Offline earnings unlocked! Come back later to collect.');
+        updateDisplay();
+      } else {
+        alert('Not enough eggs for offline earnings!');
+      }
+    });
+
+    buyChickenButton.addEventListener('click', () => {
+      if (score >= 200) {
+        score -= 200;
+        chickens++;
+        updateDisplay();
+      } else {
+        alert('Not enough eggs to buy a chicken!');
+      }
+    });
+
+    rebirthButton.addEventListener('click', () => {
+      const cost = getRebirthCost();
+      if (score >= cost) {
+        score = 0;
+        clickPower = 1 + ++rebirths;
+        passiveEarnings = 0;
+        chickens = 0;
+        updateDisplay();
+      } else {
+        alert(`You need ${cost} eggs to rebirth!`);
+      }
+    });
+
+    // Offline earnings
+    window.addEventListener('load', () => {
+      const now = Date.now();
+      const savedTime = parseInt(localStorage.getItem('lastActiveTime')) || now;
+      const deltaSeconds = Math.floor((now - savedTime) / 1000);
+      if (offlineEarningsUnlocked && deltaSeconds > 0) {
+        const offlineEggs = deltaSeconds * (passiveEarnings + chickens);
+        score += offlineEggs;
+        alert(`Welcome back! You earned ${offlineEggs} eggs while you were away.`);
+        updateDisplay();
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem('lastActiveTime', Date.now().toString());
+    });
+
+    updateDisplay();
+  </script></body>
+</html>
