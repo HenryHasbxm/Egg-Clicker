@@ -1,11 +1,116 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Egg Clicker Game</title>
   <style>
-    /* Existing styles omitted for brevity (same as before) */
-    /* ... All styles already present in your document ... */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(to bottom, #fceabb, #f8b500);
+      color: #333;
+      overflow-x: hidden;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    button {
+      font-size: 18px;
+      padding: 15px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    #clicker-button {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 24px;
+      padding: 20px 40px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .upgrade-button, .menu-button {
+      background-color: #2196F3;
+      color: white;
+    }
+    .upgrade-button:hover, .menu-button:hover {
+      background-color: #1e88e5;
+    }
+    .rebirth-button {
+      background-color: #FF5722;
+      color: white;
+    }
+    .rebirth-button:hover {
+      background-color: #e64a19;
+    }
+    #score, #click-power, #rebirths, #passive-earnings, #chickens {
+      font-size: 24px;
+      margin: 10px;
+      animation: fadeIn 1s ease;
+    }
+    .egg-container {
+      position: relative;
+      width: 100px;
+      height: 130px;
+      margin: 20px auto;
+    }
+    .egg {
+      position: absolute;
+      width: 100px;
+      height: 130px;
+      background: radial-gradient(circle at 50% 50%, #fff 0%, #f4f4f4 100%);
+      border-radius: 50% 50% 45% 45%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      animation: bounce 2s infinite ease-in-out;
+    }
+    @keyframes bounce {
+      0%, 100% { top: 0; }
+      50% { top: 10px; }
+    }
+    .floating-egg {
+      position: absolute;
+      left: 50%;
+      top: 60%;
+      font-size: 20px;
+      color: #4CAF50;
+      animation: floatUp 1s ease-out forwards;
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -100px); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #upgrade-menu {
+      display: none;
+      margin-top: 20px;
+    }
     #credits {
       display: none;
       margin-top: 20px;
@@ -15,7 +120,6 @@
 </head>
 <body>
   <h1>Egg Clicker</h1>
-  <button class="theme-toggle" onclick="toggleTheme()">Toggle Light/Dark Mode</button>
   <div class="egg-container">
     <div class="egg" id="animated-egg"></div>
   </div>
@@ -25,16 +129,15 @@
   <div id="passive-earnings">Passive Earnings: 0 eggs/sec</div>
   <div id="chickens">Chickens: 0</div>
   <div id="rebirths">Rebirths: 0</div>
-  <div id="rebirth-cost">Rebirth Cost: 1000 eggs</div>
-  <button class="menu-button" onclick="toggleUpgradeMenu()">Toggle Upgrades</button>
+  <div id="rebirth-cost">Rebirth Cost: 1000 eggs</div><button class="menu-button" onclick="toggleUpgradeMenu()">Toggle Upgrades</button>
+
   <div id="upgrade-menu">
     <h2>Upgrades</h2>
     <button class="upgrade-button" id="upgrade-click">Upgrade Click</button>
     <button class="upgrade-button" id="upgrade-passive">Passive Income</button>
     <button class="upgrade-button" id="upgrade-offline">Offline Earnings</button>
     <button class="upgrade-button" id="buy-chicken">Buy Chicken</button>
-  </div>
-  <h2>Rebirth</h2>
+  </div>  <h2>Rebirth</h2>
   <button class="rebirth-button" id="rebirth">Rebirth</button>  <div id="chicken-display"></div><button class="menu-button" onclick="toggleCredits()">Credits</button>
 
   <div id="credits">
@@ -47,11 +150,24 @@
   </div><audio id="click-sound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
 
   <script>
-    // All your game logic stays the same
-    // Append credit toggle function:
+    function toggleUpgradeMenu() {
+      const menu = document.getElementById('upgrade-menu');
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
     function toggleCredits() {
       const credits = document.getElementById('credits');
       credits.style.display = credits.style.display === 'none' ? 'block' : 'none';
     }
+    function clickEgg() {
+      const sound = document.getElementById('click-sound');
+      sound.currentTime = 0;
+      sound.play();
+
+      const span = document.createElement('span');
+      span.textContent = "+1";
+      span.className = 'floating-egg';
+      document.body.appendChild(span);
+      setTimeout(() => span.remove(), 1000);
+    }
   </script></body>
-</html>
+  </html>
