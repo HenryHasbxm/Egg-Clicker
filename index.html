@@ -6,179 +6,234 @@
   <title>Egg Clicker Game</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 40px;
-      background: linear-gradient(to bottom, #fceabb, #f8b500);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      background: linear-gradient(135deg, #fceabb, #f8b500);
       color: #333;
-      overflow-x: hidden;
-      user-select: none; /* Prevents text highlighting while clicking fast */
+      overflow: hidden;
+      user-select: none;
     }
-    h1 {
-      font-size: 3em;
-      margin-bottom: 20px;
-    }
-    .egg-container {
+
+    /* Left Side: Game Area */
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       position: relative;
-      width: 120px;
-      height: 160px;
-      margin: 40px auto;
+    }
+
+    .egg-container {
+      width: 250px; /* Made the egg significantly bigger */
+      height: 320px;
       cursor: pointer;
-      transition: transform 0.1s;
+      transition: transform 0.05s;
+      position: relative;
+      z-index: 2;
     }
+
     .egg-container:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
+
     .egg {
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at 50% 50%, #fff 0%, #f4f4f4 100%);
+      background: radial-gradient(circle at 40% 40%, #fff 0%, #e0e0e0 100%);
       border-radius: 50% 50% 45% 45%;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      border: 4px solid rgba(255,255,255,0.5);
+    }
+
+    /* Skins */
+    .egg.sparkle { box-shadow: 0 0 40px 10px #e0f7fa; border-color: #b2ebf2; }
+    .egg.flame { background: linear-gradient(to top, #ff7043, #ffe0b2); border-color: #ffccbc; }
+    .egg.rainbow { background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); border-color: #fff; }
+    .egg.crystal { background: linear-gradient(to top left, #e1f5fe, #b3e5fc); border: 4px solid #81d4fa; }
+    .egg.golden { background: linear-gradient(to top, #fff176, #fdd835); box-shadow: 0 0 30px #ffeb3b; border-color: #fbc02d; }
+
+    .stats-under-egg {
+      margin-top: 30px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+      min-width: 200px;
+    }
+
+    .stat-line {
+      font-size: 22px;
+      margin: 8px 0;
+      font-weight: 600;
+    }
+
+    /* Right Side: GUI Panel */
+    .side-panel {
+      width: 300px;
+      background: rgba(0, 0, 0, 0.05);
+      border-left: 2px solid rgba(0, 0, 0, 0.1);
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: #555;
+      flex-direction: column;
+      padding: 30px;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
     }
-    /* Skin Classes */
-    .egg.sparkle { box-shadow: 0 0 20px 5px #e0f7fa; }
-    .egg.flame { background: linear-gradient(to top, #ff7043, #ffe0b2); }
-    .egg.rainbow { background: linear-gradient(135deg, red, orange, yellow, green, blue, indigo, violet); }
-    .egg.crystal { background: linear-gradient(to top left, #e1f5fe, #b3e5fc); border: 2px solid #81d4fa; }
-    .egg.golden { background: linear-gradient(to top, #fff176, #fdd835); box-shadow: 0 0 20px 5px #ffeb3b; }
 
-    .stats-container {
-      background: rgba(255, 255, 255, 0.3);
-      padding: 15px;
-      border-radius: 15px;
-      display: inline-block;
-      margin-bottom: 20px;
+    .side-panel h2 {
+      margin-top: 0;
+      font-size: 28px;
+      text-align: center;
+      color: #444;
     }
-    .stat { font-size: 20px; margin: 5px; }
 
-    .nav-buttons { margin-top: 20px; }
-    button {
-      font-size: 16px;
-      padding: 12px 24px;
-      margin: 5px;
+    .nav-btn {
+      width: 100%;
+      font-size: 18px;
+      padding: 18px;
+      margin-bottom: 15px;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       background-color: #2196F3;
       color: white;
-      box-shadow: 0 4px 0 #1976D2;
+      box-shadow: 0 5px 0 #1976D2;
       transition: all 0.1s;
+      font-weight: bold;
     }
-    button:active {
-      transform: translateY(3px);
+
+    .nav-btn:active {
+      transform: translateY(4px);
       box-shadow: 0 1px 0 #1976D2;
     }
-    .rebirth-btn { background-color: #FF5722; box-shadow: 0 4px 0 #E64A19; }
 
-    /* Modal (Popup) Styling */
+    .rebirth-btn { background-color: #FF5722; box-shadow: 0 5px 0 #E64A19; }
+
+    /* Modals */
     .modal {
       display: none;
       position: fixed;
-      z-index: 100;
+      z-index: 1000;
       left: 0;
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.6);
       backdrop-filter: blur(4px);
     }
     .modal-content {
-      background-color: #fff;
+      background: white;
       margin: 10% auto;
-      padding: 25px;
-      border-radius: 20px;
-      width: 80%;
-      max-width: 450px;
+      padding: 30px;
+      border-radius: 25px;
+      width: 90%;
+      max-width: 400px;
       position: relative;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-    .close-btn {
+    .close-x {
       position: absolute;
-      top: 10px;
+      top: 15px;
       right: 20px;
-      font-size: 28px;
+      font-size: 30px;
       cursor: pointer;
-      color: #888;
+      color: #aaa;
     }
-    .shop-item {
+    .shop-btn {
       display: block;
       width: 100%;
+      padding: 15px;
       margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #f9f9f9;
+      cursor: pointer;
+      font-size: 16px;
       text-align: left;
     }
+    .shop-btn:hover { background: #eee; }
 
-    .floating-egg {
+    .floating-text {
       position: absolute;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
       color: #2e7d32;
       pointer-events: none;
       animation: floatUp 0.8s ease-out forwards;
+      z-index: 10;
     }
+
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-100px); }
+      100% { opacity: 0; transform: translateY(-120px); }
     }
   </style>
 </head>
 <body>
 
-  <h1>Egg Clicker</h1>
+  <div class="game-area">
+    <div class="egg-container" onclick="clickEgg(event)">
+      <div class="egg" id="main-egg"></div>
+    </div>
 
-  <div class="stats-container">
-    <div class="stat" id="score">Eggs: 0</div>
-    <div class="stat" id="click-power">Per Click: 1</div>
-    <div class="stat" id="passive-earnings">Passive: 0/sec</div>
-    <div id="rebirths" style="font-weight: bold;">Rebirths: 0</div>
-  </div>
-
-  <div class="egg-container" onclick="clickEgg(event)">
-    <div class="egg" id="animated-egg">CLICK ME</div>
-  </div>
-
-  <div class="nav-buttons">
-    <button onclick="openModal('upgradeModal')">Upgrades</button>
-    <button onclick="openModal('inventoryModal')">Inventory</button>
-    <button onclick="openModal('creditsModal')">Credits</button>
-  </div>
-
-  <div id="upgradeModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('upgradeModal')">&times;</span>
-      <h2>Upgrades</h2>
-      <button class="shop-item" onclick="upgradeClick()">Upgrade Click (50 Eggs)</button>
-      <button class="shop-item" onclick="upgradePassive()">Passive Income (100 Eggs)</button>
-      <button class="shop-item" onclick="buyChicken()">Buy Chicken (200 Eggs)</button>
-      <hr>
-      <button class="rebirth-btn shop-item" onclick="rebirth()">Rebirth (Reset for Multiplier)</button>
+    <div class="stats-under-egg">
+      <div class="stat-line" id="score">Eggs: 0</div>
+      <div class="stat-line" id="click-power" style="font-size: 16px; opacity: 0.8;">Per Click: 1</div>
+      <div class="stat-line" id="passive-earnings" style="font-size: 16px; opacity: 0.8;">Passive: 0/sec</div>
+      <div id="rebirth-count" style="margin-top:10px; color: #d32f2f;">Rebirths: 0</div>
     </div>
   </div>
 
-  <div id="inventoryModal" class="modal">
+  <div class="side-panel">
+    <h2>Menu</h2>
+    <button class="nav-btn" onclick="openModal('shopModal')">Upgrades</button>
+    <button class="nav-btn" onclick="openModal('invModal')">Skins</button>
+    <button class="nav-btn rebirth-btn" onclick="openModal('rebirthModal')">Rebirth</button>
+    <button class="nav-btn" style="background:#888; box-shadow: 0 5px 0 #666; margin-top: auto;" onclick="openModal('credModal')">Credits</button>
+  </div>
+
+  <div id="shopModal" class="modal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('inventoryModal')">&times;</span>
-      <h2>Inventory</h2>
-      <p>Select a shell (1,000 Eggs each):</p>
-      <button class="shop-item" onclick="confirmEquip('sparkle')">✨ Sparkle Shell (+1/sec)</button>
-      <button class="shop-item" onclick="confirmEquip('flame')">🔥 Flame Shell (+5% Click)</button>
-      <button class="shop-item" onclick="confirmEquip('rainbow')">🌈 Rainbow Shell (+10% Passive)</button>
-      <button class="shop-item" onclick="confirmEquip('crystal')">💎 Crystal Shell (+3/sec)</button>
-      <button class="shop-item" onclick="confirmEquip('golden')">🥇 Golden Shell (+3 Click)</button>
+      <span class="close-x" onclick="closeModal('shopModal')">&times;</span>
+      <h3>Upgrades</h3>
+      <button class="shop-btn" onclick="buyUpgrade('click')">💪 Better Clicks (50 Eggs)</button>
+      <button class="shop-btn" onclick="buyUpgrade('passive')">🕒 Passive Farm (100 Eggs)</button>
+      <button class="shop-btn" onclick="buyUpgrade('chicken')">🐔 Buy Chicken (200 Eggs)</button>
     </div>
   </div>
 
-  <div id="creditsModal" class="modal">
+  <div id="invModal" class="modal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('creditsModal')">&times;</span>
-      <h2>Credits</h2>
-      <p><strong>Everything by:</strong> Henry Lin</p>
-      <p>Concept, Design, and Dev: Henry Lin 🥚✨</p>
+      <span class="close-x" onclick="closeModal('invModal')">&times;</span>
+      <h3>Egg Shells</h3>
+      <p>Cost: 1,000 Eggs each</p>
+      <button class="shop-btn" onclick="tryEquip('sparkle')">✨ Sparkle Shell</button>
+      <button class="shop-btn" onclick="tryEquip('flame')">🔥 Flame Shell</button>
+      <button class="shop-btn" onclick="tryEquip('rainbow')">🌈 Rainbow Shell</button>
+      <button class="shop-btn" onclick="tryEquip('crystal')">💎 Crystal Shell</button>
+      <button class="shop-btn" onclick="tryEquip('golden')">🥇 Golden Shell</button>
+    </div>
+  </div>
+
+  <div id="rebirthModal" class="modal">
+    <div class="modal-content">
+      <span class="close-x" onclick="closeModal('rebirthModal')">&times;</span>
+      <h3>Rebirth</h3>
+      <p>Reset all eggs and upgrades for a permanent 2x start boost.</p>
+      <p><strong>Requirement: 1,000 Eggs</strong></p>
+      <button class="nav-btn rebirth-btn" onclick="doRebirth()">Rebirth Now</button>
+    </div>
+  </div>
+
+  <div id="credModal" class="modal">
+    <div class="modal-content">
+      <span class="close-x" onclick="closeModal('credModal')">&times;</span>
+      <h3>Credits</h3>
+      <p><strong>Lead Developer:</strong> Henry Lin</p>
+      <p><strong>Visual Design:</strong> Henry Lin</p>
+      <p><strong>Original Concept:</strong> Henry Lin</p>
     </div>
   </div>
 
@@ -186,99 +241,78 @@
     let eggs = 0;
     let eggsPerClick = 1;
     let passiveIncome = 0;
-    let chickens = 0;
-    let rebirthCount = 0;
-    let ownedItems = {};
+    let rebirths = 0;
+    let ownedSkins = {};
 
-    function updateScore() {
-      document.getElementById('score').textContent = `Eggs: ${eggs}`;
+    function updateUI() {
+      document.getElementById('score').textContent = `Eggs: ${Math.floor(eggs)}`;
       document.getElementById('click-power').textContent = `Per Click: ${eggsPerClick}`;
       document.getElementById('passive-earnings').textContent = `Passive: ${passiveIncome}/sec`;
-      document.getElementById('rebirths').textContent = `Rebirths: ${rebirthCount}`;
+      document.getElementById('rebirth-count').textContent = `Rebirths: ${rebirths}`;
     }
 
-    // Modal Controls
     function openModal(id) { document.getElementById(id).style.display = 'block'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // Close on outside click
-    window.onclick = function(event) {
-      if (event.target.className === 'modal') {
-        event.target.style.display = "none";
-      }
-    }
+    window.onclick = (e) => { if(e.target.className === 'modal') e.target.style.display = 'none'; }
 
-    function clickEgg(event) {
+    function clickEgg(e) {
       eggs += eggsPerClick;
-      updateScore();
+      updateUI();
       
-      // Floating text effect
-      const span = document.createElement('span');
-      span.textContent = "+" + eggsPerClick;
-      span.className = 'floating-egg';
-      span.style.left = event.clientX + 'px';
-      span.style.top = event.clientY + 'px';
-      document.body.appendChild(span);
-      setTimeout(() => span.remove(), 800);
+      const spawnX = e.clientX;
+      const spawnY = e.clientY;
+      const txt = document.createElement('div');
+      txt.className = 'floating-text';
+      txt.textContent = `+${eggsPerClick}`;
+      txt.style.left = `${spawnX}px`;
+      txt.style.top = `${spawnY}px`;
+      document.body.appendChild(txt);
+      setTimeout(() => txt.remove(), 800);
     }
 
-    function upgradeClick() {
-      if (eggs >= 50) { eggs -= 50; eggsPerClick++; updateScore(); } 
-      else { alert("Not enough eggs!"); }
+    function buyUpgrade(type) {
+      if (type === 'click' && eggs >= 50) { eggs -= 50; eggsPerClick++; }
+      else if (type === 'passive' && eggs >= 100) { eggs -= 100; passiveIncome++; }
+      else if (type === 'chicken' && eggs >= 200) { eggs -= 200; passiveIncome += 2; }
+      else { alert("Not enough eggs!"); return; }
+      updateUI();
     }
 
-    function upgradePassive() {
-      if (eggs >= 100) { eggs -= 100; passiveIncome++; updateScore(); } 
-      else { alert("Not enough eggs!"); }
-    }
-
-    function buyChicken() {
-      if (eggs >= 200) { eggs -= 200; chickens++; passiveIncome += 2; updateScore(); } 
-      else { alert("Not enough eggs!"); }
-    }
-
-    function confirmEquip(item) {
-      if (!ownedItems[item] && eggs < 1000) {
-        alert("Not enough eggs!");
-        return;
+    function tryEquip(skin) {
+      if (!ownedSkins[skin]) {
+        if (eggs >= 1000) {
+          eggs -= 1000;
+          ownedSkins[skin] = true;
+        } else {
+          alert("Need 1,000 eggs!");
+          return;
+        }
       }
-      if (confirm("Equip this shell?")) {
-        if (!ownedItems[item]) { eggs -= 1000; ownedItems[item] = true; }
-        applyItemEffects(item);
-        document.getElementById('animated-egg').className = `egg ${item}`;
-        updateScore();
-        closeModal('inventoryModal');
-      }
+      document.getElementById('main-egg').className = `egg ${skin}`;
+      // Apply bonus once per equip for simplicity
+      if (skin === 'golden') eggsPerClick += 2;
+      if (skin === 'sparkle') passiveIncome += 1;
+      updateUI();
+      closeModal('invModal');
     }
 
-    function applyItemEffects(item) {
-      if (item === 'sparkle') passiveIncome += 1;
-      if (item === 'flame') eggsPerClick = Math.ceil(eggsPerClick * 1.05);
-      if (item === 'rainbow') passiveIncome = Math.ceil(passiveIncome * 1.1);
-      if (item === 'crystal') passiveIncome += 3;
-      if (item === 'golden') eggsPerClick += 3;
-    }
-
-    function rebirth() {
-      if (eggs < 1000 && rebirthCount === 0) {
-        alert("You need at least 1,000 eggs to rebirth!");
-        return;
-      }
+    function doRebirth() {
+      if (eggs < 1000) { alert("Need 1,000 eggs!"); return; }
       eggs = 0;
-      eggsPerClick = 5;
-      passiveIncome = 2;
-      rebirthCount++;
-      updateScore();
-      closeModal('upgradeModal');
-      alert('Rebirth complete! Stats boosted.');
+      rebirths++;
+      eggsPerClick = 1 + (rebirths * 5);
+      passiveIncome = rebirths * 2;
+      updateUI();
+      closeModal('rebirthModal');
     }
 
     setInterval(() => {
       eggs += passiveIncome;
-      updateScore();
+      updateUI();
     }, 1000);
 
-    updateScore();
+    updateUI();
   </script>
 </body>
 </html>
